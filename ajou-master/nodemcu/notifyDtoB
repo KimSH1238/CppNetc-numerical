@@ -1,0 +1,43 @@
+#define BLYNK_PRINT Serial
+
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+#include "DHT.h"
+
+#define DHTPIN D2
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+char auth[] = "*******";
+char ssid[] = "maker space";
+char pass[] = "tenadmin9500";
+
+void setup()
+{
+  Serial.begin(9600);
+  Blynk.begin(auth, ssid, pass);
+  dht.begin();
+}
+
+BLYNK_READ(V2)
+{
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  Blynk.virtualWrite(V2, h);
+  Blynk.virtualWrite(V3, t);
+  if (isnan(t) || isnan(h) {
+    return;
+  }
+  if (t > 40) {
+    Blynk.notify(String("Temperature is too high: ") + t);
+  }
+  if(h > 70.0){
+    Blynk.notify(String("Humidity is too high") + h);
+  }
+}
+
+void loop()
+{
+  Blynk.run();
+}
